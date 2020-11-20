@@ -1,6 +1,6 @@
 
 # Installation
-  - Install allure commanline [installation guide](https://docs.qameta.io/allure/#_installing_a_commandline)  
+  - Install allure commandline [installation guide](https://docs.qameta.io/allure/#_installing_a_commandline)  
   - Install the dependencies 
   ```sh
   pip3 install -r requirements.txt
@@ -12,7 +12,7 @@
 | selenium | To manipulate with browser|
 | pytest | To run tests |
 | pytest-xdist | To support parallel test run |
-| webdriver-manager | To support different version and type browsers |
+| webdriver-manager | To support different versions and type of browsers |
 | allure-pytest | To integrate allure reporter with pytests |
 | pytest-json-report | To generate json reports |
 
