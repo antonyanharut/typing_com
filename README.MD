@@ -1,6 +1,7 @@
 
 # Installation
-  Install the dependencies 
+  - Install allure commanline [installation guide](https://docs.qameta.io/allure/#_installing_a_commandline)  
+  - Install the dependencies 
   ```sh
   pip3 install -r requirements.txt
   ```
