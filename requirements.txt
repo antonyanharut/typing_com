@@ -1,0 +1,7 @@
+selenium==3.141.0
+pytest==6.1.2
+webdriver-manager==3.2.2
+allure-pytest>=2.8.19
+pytest-xdist==2.1.0
+#monkeypatch==0.1rc3
+pytest-json-report>=1.2.4

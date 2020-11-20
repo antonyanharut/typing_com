@@ -1,0 +1,6 @@
+.pytest_chache
+allure-reports*
+results_*
+*_report.json
+*.log
+venv
