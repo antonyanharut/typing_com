@@ -1,3 +1,6 @@
+# System Requirements:
+ - python3 
+ - pip3
 
 # Installation
   - Install allure commandline [installation guide](https://docs.qameta.io/allure/#_installing_a_commandline)  
@@ -5,7 +8,7 @@
   ```sh
   pip3 install -r requirements.txt
   ```
-### Plugins
+### Used Plugins
 
 | Plugin | README |
 | ------ | ------ |
