@@ -4,7 +4,7 @@ import time
 import allure
 
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException, \
-    ElementNotInteractableException, ElementClickInterceptedException
+    ElementNotInteractableException, ElementClickInterceptedException, ElementNotVisibleException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
@@ -13,9 +13,11 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 
 class BasePage:
+
     def __init__(self, driver: WebDriver):
         self.driver: WebDriver = driver
         self.page = ''
+        self.wait_action = wait = WebDriverWait(driver, 20, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, NoSuchElementException,ElementNotInteractableException])
 
     def correct_url(self) -> str:
         return f"{os.environ.get('URL')}/{self.page}"
@@ -81,10 +83,11 @@ class BasePage:
 
     # StaleElementReferenceException
     def click_on_element(self, locator):
+        # self.driver.execute_script("arguments[0].scrollIntoView()", self.find_element(locator))
         is_stale = True
         while is_stale:
             try:
-                self.find_element(locator).click()
+                self.wait_action.until(EC.element_to_be_clickable(locator)).click()
                 is_stale = False
             except StaleElementReferenceException:
                 print(locator)
@@ -95,6 +98,7 @@ class BasePage:
                 ActionChains(self.driver).move_to_element(element).click(element).perform()
                 time.sleep(1)
                 is_stale = False
+
 
 
     def find_element(self, locator) -> WebElement:

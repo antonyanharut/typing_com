@@ -517,7 +517,7 @@ class TeacherClassesPageLocator:
     first_class = (By.XPATH, "//tr[@data-tour='first-class-row'][1]")
     class_with_name = (
         By.XPATH,
-        "//tr[@data-tour='first-class-row']/td/div/div[contains(text(),'class_name')]/ancestor::tr[@data-tour='first-class-row']")
+        "//tr[@data-tour='first-class-row']/td/div/div[contains(text(),'class_name')]/ancestor::tr[@data-tour='first-class-row']/td[2]")
     class_title = (By.XPATH, "//td[2]")
     class_students_count = (By.XPATH, "//td[3]")
 

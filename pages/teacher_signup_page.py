@@ -1,5 +1,7 @@
 import allure
 import time
+
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -14,7 +16,12 @@ class CompleteYourSignupPage(BasePage):
         super().__init__(driver)
         self.full_name = full_name
         with allure.step("Wait for Complete your signup page to be loaded"):
-            self.wait_until_element_located(CompleteYourSignupPageLocator.signup_form)
+            try:
+                self.wait_until_element_located(CompleteYourSignupPageLocator.signup_form)
+            except TimeoutException:
+                raise RuntimeError(
+                    "Something unexpected has happened,"
+                    " please log in to your Google account and confirm that the last login into google account was made by you")
 
     @allure.step("Verify `Teacher` form of Complete Your Signup page present")
     def assert_teacher_form_present(self):
