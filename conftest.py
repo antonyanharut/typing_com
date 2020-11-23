@@ -14,6 +14,12 @@ def get_driver(request):
     browser = os.environ["BROWSER"]
     if browser == browsers.CHROME:
         driver = webdriver.Chrome(ChromeDriverManager().install())
+        if 'THROUGHPUT' in os.environ.copy():
+            driver.set_network_conditions(
+                offline=False,
+                latency=5,
+                throughput=int(os.environ['THROUGHPUT']) * 1024,
+            )
     elif browser == browsers.FIREFOX:
         driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
     elif browser == browsers.IE:
@@ -22,7 +28,9 @@ def get_driver(request):
         driver = webdriver.Edge(EdgeChromiumDriverManager().install())
     elif browser == browsers.SAFARI:
         driver = webdriver.Safari()
+
     driver.maximize_window()
+
     request.cls.driver = driver
     yield
     driver.close()

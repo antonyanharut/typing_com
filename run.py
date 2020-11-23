@@ -22,6 +22,7 @@ parser.add_argument('--page', type=str, help='Input page', choices=['login', 'te
                                                                     'teacher-curriculum',
                                                                     'teacher-order',
                                                                     'teacher-assignments'])
+parser.add_argument('--throughput')
 parser.add_argument('--group', type=str, default='', help='Input page')
 parser.add_argument('--case', type=str, default='', help='Input page')
 parser.add_argument('--thread_count', '-t', default=None, help='Input threads count')
@@ -44,14 +45,8 @@ base_url = 'https://{}.typing.com'.format(url_add[args.env])
 os.environ["ENV"] = args.env
 os.environ["URL"] = base_url
 
-if args.to_email is not None:
-    os.environ["TO_EMAIL"] = args.to_email
-    os.environ["FROM_EMAIL"] = args.from_email
-    os.environ["PASSWORD"] = args.password
-    os.environ["SMTP_HOST"] = args.smtp_host
-    os.environ["SMTP_PORT"] = args.smtp_port
-if args.send_slack:
-    os.environ["SLACK_HOOK"] = args.slack_hook
+if args.throughput is not None:
+    os.environ['THROUGHPUT'] = args.throughput
 
 print(f'Running the tests using {args.browser} parallel threads')
 
