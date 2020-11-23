@@ -86,9 +86,9 @@ class BillingInfoForm(BasePage):
         Select(self.find_element(BillingInfoLocator.country_select_box)).select_by_visible_text(country)
         return self
 
-    @allure.step("Click on 'Generate Price Quote` button")
-    def click_on_generate_price_quote_button(self):
-        self.click_on_element(BillingInfoLocator.generate_price_quote_button)
+    @allure.step("Submit")
+    def submit(self):
+        self.find_element(BillingInfoLocator.zip_code_field).submit()
         # self.wait_until_element_located((By.CLASS_NAME, 'js-loading-animation'))
         self.wait_until_url_contains("teacher/order")
 

@@ -88,7 +88,7 @@ class TeacherDashboardPage(BasePage):
                 .select_state(state) \
                 .select_country(country) \
                 .type_zip_code_field(zip) \
-                .click_on_generate_price_quote_button()
+                .submit()
             return TeacherOrderPage(self.driver)
 
     @allure.step("Create a new class with `{1}` name")
@@ -99,7 +99,7 @@ class TeacherDashboardPage(BasePage):
         class_form.assert_class_name_field_present()
         class_form.assert_create_class_button_present()
         class_form.type_class_name(class_name)
-        new_created_class_form = class_form.click_on_create_class_button()
+        new_created_class_form = class_form.submit_to_create_class()
         new_created_class_form.assert_close_button_present()
         new_created_class_form.click_on_close_button()
         return TeacherClassesPage(self.driver)

@@ -1,7 +1,9 @@
+import os
 import time
 
 import allure
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
@@ -56,7 +58,11 @@ class TeacherCurriculumPage(BasePage):
 
     @allure.step("Click on the `Create/View Test` button")
     def click_on_test_button(self):
-        self.click_on_element(TeacherCurriculumPageLocator.tests_button)
+        if os.environ['BROWSER'] == 'safari':
+            self.driver.execute_script("arguments[0].click()",
+                                       self.find_element(TeacherCurriculumPageLocator.tests_button))
+        else:
+            self.click_on_element(TeacherCurriculumPageLocator.tests_button)
 
     def create_custom_lesson(self, lesson_title="Test", typing_content="Test Content"):
         with allure.step(f"Create custom lesson with `{lesson_title}` title and `{typing_content}` typing content"):
@@ -69,7 +75,7 @@ class TeacherCurriculumPage(BasePage):
             lesson_form.assert_create_custom_lesson_button_present()
             lesson_form.type_title_field(lesson_title)
             lesson_form.type_typing_content_field(typing_content)
-            lesson_form.click_on_create_custom_lesson_button()
+            lesson_form.submit_to_create_custom_lesson()
             self.wait_until_success()
         return self
 
@@ -84,7 +90,7 @@ class TeacherCurriculumPage(BasePage):
             test_form.assert_create_a_custom_timed_test_present()
             test_form.type_title_field(test_title)
             test_form.type_typing_content_field(test_screen_content)
-            test_form.click_on_create_custom_timed_test_button()
+            test_form.submit_to_create_custom_timed_test()
             self.wait_until_success()
         return self
 
@@ -118,9 +124,9 @@ class CreateACustomLessonForm(BasePage):
     def type_typing_content_field(self, content):
         self.find_element(CreateACustomLessonLocator.typing_content_field).send_keys(content)
 
-    @allure.step("Click on the `Create Custom Lesson` button")
-    def click_on_create_custom_lesson_button(self):
-        self.click_on_element(CreateACustomLessonLocator.create_custom_lesson_button)
+    @allure.step("Submit to create custom lesson")
+    def submit_to_create_custom_lesson(self):
+        self.find_element(CreateACustomLessonLocator.lesson_title_field).submit()
 
 
 class CreateACustomTestForm(BasePage):
@@ -152,9 +158,9 @@ class CreateACustomTestForm(BasePage):
     def type_typing_content_field(self, content):
         self.find_element(CreateACustomTestLocator.test_screen_content_field).send_keys(content)
 
-    @allure.step("Click on the `Create Custom Timed Test` button")
-    def click_on_create_custom_timed_test_button(self):
-        self.click_on_element(CreateACustomTestLocator.create_custom_timed_test_button)
+    @allure.step("Submit create custom timed test")
+    def submit_to_create_custom_timed_test(self):
+        self.find_element(CreateACustomTestLocator.typing_test_title_field).submit()
 
 
 class CreateACustomLessonLocator:

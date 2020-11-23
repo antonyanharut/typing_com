@@ -1,3 +1,5 @@
+import os
+
 import allure
 import time
 
@@ -49,7 +51,10 @@ class CompleteYourSignupPage(BasePage):
 
     @allure.step("Click on the signup button")
     def click_on_signup_button(self) -> WelcomeToTypingPage:
-        self.find_element(CompleteYourSignupPageLocator.signup_button).click()
+        if os.environ['BROWSER'] == 'safari':
+            self.driver.execute_script("arguments[0].click()",self.find_element(CompleteYourSignupPageLocator.signup_button))
+        else:
+            self.find_element(CompleteYourSignupPageLocator.signup_button).click()
         return WelcomeToTypingPage(self.driver, self.full_name)
 
     @allure.step("Select '{1}' from country dropdown")

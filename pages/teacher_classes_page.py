@@ -1,6 +1,11 @@
+import os
+import re
+
 import allure
 from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 import time
@@ -56,9 +61,9 @@ class AddStudentsForm(BasePage):
     def type_password(self, password: str):
         self.find_element(AddStudentsLocator.password_field).send_keys(password)
 
-    @allure.step("Click on `Create Single Student` button of `Add Students` form")
-    def click_on_create_single_student_button(self):
-        self.click_on_element(AddStudentsLocator.create_single_student_button)
+    @allure.step("Submit")
+    def submit_to_create_a_student(self):
+        self.find_element(AddStudentsLocator.password_field).submit()
 
     @allure.step("Click on `Close` button of `Add Students` form")
     def click_on_close_button(self):
@@ -82,13 +87,13 @@ class AddStudentsForm(BasePage):
         if type(username) is str:
             self.type_username(username)
             self.type_password('Tester#123')
-            self.click_on_create_single_student_button()
+            self.submit_to_create_a_student()
             self.assert_student_added_successfully()
         else:
             for i in range(0, len(username)):
                 self.type_username(username[i])
                 self.type_password('Tester#123')
-                self.click_on_create_single_student_button()
+                self.submit_to_create_a_student()
                 self.assert_student_added_successfully()
                 time.sleep(1)
         self.assert_close_button_present()
@@ -146,9 +151,9 @@ class CreateAClassForm(BasePage):
     def type_class_name(self, class_name: str):
         self.find_element(CreateAClassLocator.class_name_field).send_keys(class_name)
 
-    @allure.step("Click on `Create Class` button of `Create A New Class` form")
-    def click_on_create_class_button(self) -> YouHaveCreatedNewClassForm:
-        self.click_on_element(CreateAClassLocator.create_class_button)
+    @allure.step("Submit to create class")
+    def submit_to_create_class(self) -> YouHaveCreatedNewClassForm:
+        self.find_element(CreateAClassLocator.class_name_field).submit()
         return YouHaveCreatedNewClassForm(self.driver)
 
 
@@ -293,9 +298,13 @@ class CreateAssignmentForm(BasePage):
 
     @allure.step("Select {1} from the `Select Lessons Dropdown` field")
     def select_from_select_lessons_dropdown(self, lessons):
-        self.click_on_element(CreateAssignmentLocator.select_lessons_dropdown)
+        element = self.find_element(CreateAssignmentLocator.select_lessons_dropdown)
+        element.send_keys(lessons)
         time.sleep(0.3)
-        self.click_on_element((By.XPATH, f"//ul[@class='chosen-results']/li[contains(text(),'{lessons}')]"))
+        if os.environ['BROWSER'] == 'safari':
+            element.send_keys(Keys.ENTER)
+        else:
+            self.click_on_element((By.XPATH, f"//ul[@class='chosen-results']/li[contains(text(),'{lessons}')]"))
 
     @allure.step("Select {1} from the `Assignee To Dropdown` field")
     def select_from_assignee_to_dropdown(self, class_name):
@@ -317,9 +326,9 @@ class CreateAssignmentForm(BasePage):
             time.sleep(0.3)
             self.click_on_element((By.XPATH, f"//ul[@class='chosen-results']/li[contains(text(),'{student_name}')]"))
 
-    @allure.step("Click on `Create Assignment` button")
-    def click_on_create_assignment_button(self):
-        self.click_on_element(CreateAssignmentLocator.create_assignment_button)
+    @allure.step("Submit to create assignment")
+    def submit_to_create_assignment(self):
+        self.find_element(CreateAssignmentLocator.title_field).submit()
 
     def create_typing_lessons_assignment(self, title="Test", lessons="Skill Builder", classes=None, students=None):
         with allure.step(f"Create `Typing Lessons` assignment with `{title}` title and `{lessons}` lesson"):
@@ -337,7 +346,7 @@ class CreateAssignmentForm(BasePage):
                 self.select_from_select_students_dropdown(students)
             self.type_title_field(title)
             self.select_from_select_lessons_dropdown(lessons)
-            self.click_on_create_assignment_button()
+            self.submit_to_create_assignment()
             self.wait_until_assignment_added_successfully()
 
     def create_digital_literacy_lessons_assignment(self, title="Test", lessons="Skill Builder"):
@@ -350,7 +359,7 @@ class CreateAssignmentForm(BasePage):
             self.assert_create_assignment_button_present()
             self.type_title_field(title)
             self.select_from_select_lessons_dropdown(lessons)
-            self.click_on_create_assignment_button()
+            self.submit_to_create_assignment()
             self.wait_until_assignment_added_successfully()
 
     def create_typing_assessment_assignment(self, title="Test", lessons="Skill Builder", classes=None, students=None):
@@ -369,7 +378,7 @@ class CreateAssignmentForm(BasePage):
                 self.select_from_select_students_dropdown(students)
             self.type_title_field(title)
             self.select_from_select_lessons_dropdown(lessons)
-            self.click_on_create_assignment_button()
+            self.submit_to_create_assignment()
             self.wait_until_assignment_added_successfully()
 
     def create_written_prompt_assignment(self, title="Test", prompt="Test Prompt", word_count=9):
@@ -385,7 +394,7 @@ class CreateAssignmentForm(BasePage):
             self.type_title_field(title)
             self.type_prompt_field(prompt)
             self.type_word_count_field(word_count)
-            self.click_on_create_assignment_button()
+            self.submit_to_create_assignment()
             self.wait_until_assignment_added_successfully()
 
     # fixed z-50 notice bottom-4 right-4 notice-container js-notice notice--success
@@ -431,7 +440,8 @@ class SingleClassPage(BasePage):
     @allure.step("Verify students count is {1}")
     def assert_students_count_is(self, count):
         cnt = self.find_element(SingleClassPageLocator.students_tab).text.replace(" ", "")
-        assert cnt == f'Students({count})', \
+        cnt = re.sub(r'\n\s\t', '', cnt)
+        assert f'Students' in cnt and f"({count})" in cnt, \
             f"The expected value for `Students` tab is `Students({count})` but was `{cnt}`"
         return self
 
@@ -461,9 +471,8 @@ class SingleClassPage(BasePage):
     @allure.step("Verify assignments count is {1}")
     def assert_assignments_tab_count_is(self, count):
         cnt = self.find_element(SingleClassPageLocator.assignments_tab).text.replace(" ", "")
-        cntE = f"Assignments({count})"
-        assert cnt == cntE, \
-            f"The expected value for `Assignments` tab is `{cntE}` but was `{cnt}`"
+        assert str(count) in cnt and "Assignments" in cnt, \
+            f"The expected value for `Assignments` tab is `Assignments({count})` but was `{cnt}`"
         return self
 
     @allure.step("Verify assignment with {1} name present")
@@ -504,7 +513,7 @@ class CreateAssignmentLocator:
     written_prompt = (By.XPATH, "//div[@data-id='written_prompt']")
     create_assignment_button = (By.XPATH, "//button[contains(text(), 'Create Assignment')]")
     title_field = (By.ID, "form-ele-title")
-    select_lessons_dropdown = (By.ID, "form_ele_lesson_ids_chosen")
+    select_lessons_dropdown = (By.XPATH, "//div[@id='form_ele_lesson_ids_chosen']//input")
     assignee_to = (By.ID, "form_ele_section_ids_chosen")
     select_students = (By.ID, "form_ele_user_ids_chosen")
     prompt_field = (By.XPATH, "//label[contains(text(),'Prompt')]/following-sibling::textarea")

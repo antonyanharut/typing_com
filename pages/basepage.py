@@ -4,7 +4,7 @@ import time
 import allure
 
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException, \
-    ElementNotInteractableException, ElementClickInterceptedException, ElementNotVisibleException
+    ElementNotInteractableException, ElementClickInterceptedException, ElementNotVisibleException, WebDriverException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
@@ -17,7 +17,7 @@ class BasePage:
     def __init__(self, driver: WebDriver):
         self.driver: WebDriver = driver
         self.page = ''
-        self.wait_action = wait = WebDriverWait(driver, 20, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, NoSuchElementException,ElementNotInteractableException])
+        self.wait_action = wait = WebDriverWait(driver, 20, poll_frequency=1)
 
     def correct_url(self) -> str:
         return f"{os.environ.get('URL')}/{self.page}"
@@ -88,12 +88,14 @@ class BasePage:
         while is_stale:
             try:
                 self.wait_action.until(EC.element_to_be_clickable(locator)).click()
+                # self.driver.execute_script("arguments[0].click();", self.find_element(locator))
                 is_stale = False
             except StaleElementReferenceException:
                 print(locator)
                 time.sleep(0.1)
-            except (ElementNotInteractableException, ElementClickInterceptedException):
+            except (TimeoutException, ElementNotInteractableException, ElementClickInterceptedException, WebDriverException) as e:
                 #firefox solution
+                print(e)
                 element = self.find_element(locator)
                 ActionChains(self.driver).move_to_element(element).click(element).perform()
                 time.sleep(1)
