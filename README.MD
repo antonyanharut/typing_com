@@ -33,7 +33,7 @@ $ python3 run.py  --browser chrome
 ```sh
 python3 run.py --env new
 ```
-- ```--page``` - run speciific class tests  
+- ```--page``` - run specific class tests  
  -- Supported values ```teacher-signup``` , ```teacher-classes```, ```teacher-curriculum```, ```teacher-order```, ```teacher-assignments```  
  -- No default value  
  -- Parameter is optional  
@@ -67,7 +67,7 @@ python3 run.py --group assignments
 python3 run.py -t 2
 ```
 
-- ```--throughput``` - simulate internet connectenciton speed  
+- ```--throughput``` - simulate internet connection speed  
  -- Supported only for Google Chrome
 ```sh
 python3 run.py --throughput 90
