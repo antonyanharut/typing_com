@@ -67,6 +67,12 @@ python3 run.py --group assignments
 python3 run.py -t 2
 ```
 
+- ```--throughput``` - simulate internet connectenciton speed
+ -- Supported only for Google Chrome
+```sh
+python3 run.py --throughput 90
+```
+
 ## Send test report to email  
 By default this option is turned off, you can specify ```to_email``` parameter to turn on this option  
 ### Parameters:  
