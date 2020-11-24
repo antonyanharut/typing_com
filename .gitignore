@@ -5,3 +5,4 @@ results_*
 *.log
 venv
 __pycache__/
+*.pyc

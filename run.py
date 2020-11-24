@@ -16,26 +16,26 @@ from string import Template
 import requests
 
 parser = argparse.ArgumentParser(description='Typing run')
-parser.add_argument('--env', type=str, default='live', help='Input environment', choices=['new', 'live'])
-parser.add_argument('--page', type=str, help='Input page', choices=['login', 'teacher-signup',
+parser.add_argument('--env', type=str, default='live', help='Set the environment in which tests will be run', choices=['new', 'live'])
+parser.add_argument('--page', '-p', nargs='+', help='run specific class tests', choices=['teacher-signup',
                                                                     'teacher-classes',
                                                                     'teacher-curriculum',
                                                                     'teacher-order',
                                                                     'teacher-assignments'])
-parser.add_argument('--throughput')
-parser.add_argument('--group', type=str, default='', help='Input page')
+parser.add_argument('--throughput', help='simulate internet connection speed')
+parser.add_argument('--group', type=str, default='', help='run specific group tests')
 parser.add_argument('--case', type=str, default='', help='Input page')
-parser.add_argument('--thread_count', '-t', default=None, help='Input threads count')
-parser.add_argument('--browser', '-b', nargs='+', help='Input the browser', default=['chrome'],
+parser.add_argument('--thread_count', '-t', default=None, help=' run tests in parallel')
+parser.add_argument('--browser', '-b', nargs='+', help='specify the browser in which tests will be run, please note that you can specify multiple browsers', default=['chrome'],
                     choices=['chrome', 'safari', 'firefox', 'edge'])
-parser.add_argument('--to_email', type=str, default=None)
-parser.add_argument('--from_email', type=str, default='harut@instigatemobile.com')
-parser.add_argument('--password', type=str, default='Mal!bu123')
-parser.add_argument('--smtp_host', type=str, default='mail.instigatemobile.com')
-parser.add_argument('--smtp_port', default='587')
+parser.add_argument('--to_email', type=str, default=None, help='to send email report to specified email address')
+parser.add_argument('--from_email', type=str, default='harut@instigatemobile.com', help='specify sender email')
+parser.add_argument('--password', type=str, default='Mal!bu123', help='specify sender password')
+parser.add_argument('--smtp_host', type=str, default='mail.instigatemobile.com', help='specify SMTP host')
+parser.add_argument('--smtp_port', default='587', help='specify SMTP port')
 parser.add_argument('--send_slack', default=False)
 parser.add_argument('--slack_hook',
-                    default='https://hooks.slack.com/services/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')
+                    default='https://hooks.slack.com/services/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', help='specify the Incoming Webhooks url')
 args = parser.parse_args()
 
 url_add = {"new": "new", "live": "www"}
@@ -51,9 +51,12 @@ if args.throughput is not None:
 print(f'Running the tests using {args.browser} parallel threads')
 
 bashCommand = f"pytest -s --verbose " \
-              "--allure-link-pattern=test_case:https://docs.google.com/spreadsheets/d/1P54UmzfJggGuXzZV4zMfZ1I6Isv8P5Ac0a_F_u1Deyg/edit?ts=5fb694ba#gid=763370721&range={} --allure-link-pattern=issue:https://docs.google.com/spreadsheets/d/1P54UmzfJggGuXzZV4zMfZ1I6Isv8P5Ac0a_F_u1Deyg/edit?ts=5fb694ba#gid=886796583&range={} tests/"
+              "--allure-link-pattern=test_case:https://docs.google.com/spreadsheets/d/1P54UmzfJggGuXzZV4zMfZ1I6Isv8P5Ac0a_F_u1Deyg/edit?ts=5fb694ba#gid=763370721&range={} --allure-link-pattern=issue:https://docs.google.com/spreadsheets/d/1P54UmzfJggGuXzZV4zMfZ1I6Isv8P5Ac0a_F_u1Deyg/edit?ts=5fb694ba#gid=886796583&range={}"
 if args.page is not None:
-    bashCommand += f"{args.page}_page_test.py"
+    for page in args.page:
+        bashCommand += f" tests/{page}_page_test.py"
+else:
+    bashCommand +=" tests/"
 if args.thread_count is not None:
     bashCommand += f" -n {args.thread_count}"
 if args.group:
@@ -247,11 +250,11 @@ def run_command(browser: str):
             if args.to_email is not None:
                 send_email_report(passed, failed, skipped, error, browser, platform, duration)
 
-
-pool = Pool()
-pool.map(run_command, args.browser)
-pool.close()
-pool.join()
+if __name__ == '__main__':
+    pool = Pool()
+    pool.map(run_command, args.browser)
+    pool.close()
+    pool.join()
 
 print(f'1.Used {args.thread_count} threads to run this tests'
       f'\n2.Used {args.browser} browsers fot this tests')

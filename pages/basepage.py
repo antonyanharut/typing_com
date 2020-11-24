@@ -126,5 +126,12 @@ class BasePage:
             WebDriverWait(self.driver, 5).until(EC.staleness_of(locator))
             return True
 
+    def is_element_present_after_wait(self, locator):
+        try:
+            self.wait_until_element_located(locator)
+        except TimeoutException:
+            return False
+        return True
+
     def refresh_page(self):
         self.driver.refresh()

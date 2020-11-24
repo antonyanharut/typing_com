@@ -92,7 +92,7 @@ class TeacherDashboardPage(BasePage):
             return TeacherOrderPage(self.driver)
 
     @allure.step("Create a new class with `{1}` name")
-    def create_a_new_class(self, class_name: str):
+    def create_a_new_class(self, class_name: str, function):
         class_page = self.click_on_my_classes()
         class_page.assert_create_a_new_class_button_present()
         class_form = class_page.click_on_create_a_new_class_button()
@@ -100,10 +100,24 @@ class TeacherDashboardPage(BasePage):
         class_form.assert_create_class_button_present()
         class_form.type_class_name(class_name)
         new_created_class_form = class_form.submit_to_create_class()
+        return function(new_created_class_form)
+
+    @allure.step("Click on close button")
+    def create_a_new_class_close(self, new_created_class_form):
         new_created_class_form.assert_close_button_present()
         new_created_class_form.click_on_close_button()
         return TeacherClassesPage(self.driver)
 
+    @allure.step("Click on `See My Classes ->` button")
+    def create_a_new_class_see_my_classes(self, new_created_class_form):
+        new_created_class_form.assert_see_my_classes_button_present()
+        new_created_class_form.click_on_see_my_classes_button()
+        return TeacherClassesPage(self.driver)
+
+    @allure.step("Click on `Add Students` button")
+    def create_a_new_class_add_students(self, new_created_class_form):
+        new_created_class_form.assert_add_students_button_present()
+        return new_created_class_form.click_on_add_students_button()
 
 class TeacherDashboardPageLocator:
     teacher_name = (By.XPATH, "//div[contains(@class,'mr-3') ]/div[1]")

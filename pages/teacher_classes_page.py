@@ -118,6 +118,11 @@ class YouHaveCreatedNewClassForm(BasePage):
         assert self.is_element_present(YouHaveCreatedNewClassLocator.close_button), \
             "The `Close` button of `You've` Created A new Class` form is missing"
 
+    @allure.step("Verify the `See My Classes ->` button of 'You`ve Created A New Class' form present")
+    def assert_see_my_classes_button_present(self):
+        assert self.is_element_present(YouHaveCreatedNewClassLocator.see_my_classes), \
+            "The `See My Classes ->` button of `You've` Created A new Class` form is missing"
+
     @allure.step("Click on the `Add Students` button of `You've Created A New Class` form")
     def click_on_add_students_button(self) -> AddStudentsForm:
         self.click_on_element(YouHaveCreatedNewClassLocator.add_students_button)
@@ -126,6 +131,10 @@ class YouHaveCreatedNewClassForm(BasePage):
     @allure.step("Click on the `Close` button of `You've Created A New Class` form")
     def click_on_close_button(self):
         self.click_on_element(YouHaveCreatedNewClassLocator.close_button)
+
+    @allure.step("Click on the `See My Classes ->` button of `You've Created A New Class` form")
+    def click_on_see_my_classes_button(self):
+        self.click_on_element(YouHaveCreatedNewClassLocator.see_my_classes)
 
 
 class CreateAClassForm(BasePage):
@@ -178,6 +187,7 @@ class TeacherClassesPage(BasePage):
     def assert_first_class_present(self):
         assert self.is_element_present(TeacherClassesPageLocator.first_class), \
             "first class is missing"
+        return self
 
     @allure.step("Verify first class title is `{1}`")
     def assert_first_class_title(self, exp):
@@ -185,6 +195,7 @@ class TeacherClassesPage(BasePage):
             *TeacherClassesPageLocator.class_title).text
         assert title == exp, \
             f"Expected class title to be `{exp}`, but was `{title}`"
+        return self
 
     @allure.step("Verify first class students count is `{1}`")
     def assert_first_class_students_count(self, exp):
@@ -193,12 +204,78 @@ class TeacherClassesPage(BasePage):
         assert title == str(exp), \
             f"Expected students count to be `{exp}`, but was `{title}`"
 
+    @allure.step("Verify the `Bulk Actions` present")
+    def assert_bulk_actions_present(self):
+        assert self.is_element_present(TeacherClassesPageLocator.bulk_actions), \
+            "The `Bulk Actions` is missing from the `Teacher Classes` page"
+        return self
+
+    @allure.step("Verify the `Delete Class` error dialog present")
+    def assert_delete_class_error_present(self):
+        assert self.is_element_present_after_wait(TeacherClassesPageLocator.delete_class_error_dialog), \
+            "The `Delete Class` error message is missing from the `Teacher Classes` page"
+        return self
+
+    @allure.step("Verify the `Delete Class` error message contains {1} text")
+    def assert_delete_class_error_contains(self, text):
+        actual = self.text_of(TeacherClassesPageLocator.delete_class_error_message)
+        assert text in actual, \
+            f"The `Delete Class` error message is `{actual}` and doesn't contain {text}"
+
+    @allure.step("Select {1} class")
+    def select_class_with_name(self, class_name):
+        self.click_on_element((By.XPATH,
+                               f"//tr[@data-tour='first-class-row']/td/div/div[contains(text(),'{class_name}')]/ancestor::tr[@data-tour='first-class-row']/td[contains(@class,'table-checkbox')]/input"))
+        time.sleep(0.1)
+        return self
+
+    @allure.step("Select `DELETE` option from `Bulk Actions`")
+    def select_delete_from_bulk_actions(self):
+        self.driver.execute_script("arguments[0].style.display = 'block';", self.find_element((By.XPATH,"//div[@data-id='delete']/ancestor::ul")))
+        time.sleep(0.2)
+        self.click_on_element((By.XPATH, "//div[@data-id='delete']"))
+        return self
+
     @allure.step("Click on `{1}` class")
     def click_on_class(self, class_name):
         by, selector = TeacherClassesPageLocator.class_with_name[0], TeacherClassesPageLocator.class_with_name[
             1].replace('class_name', class_name)
         self.click_on_element((by, selector))
         return SingleClassPage(self.driver)
+
+    @allure.step("Verify {1} class is missing")
+    def assert_class_missing(self, class_name):
+        by, selector = TeacherClassesPageLocator.class_with_name[0], TeacherClassesPageLocator.class_with_name[
+            1].replace('class_name', class_name)
+        assert not self.is_element_present((by, selector)), \
+            f"`{class_name}` is present"
+
+
+class DeleteClassDialog(BasePage):
+
+    def __init__(self, driver: WebDriver):
+        super().__init__(driver)
+        self.wait_until_element_located(DeleteClassDialogLocator.delete_class_dialog)
+
+    @allure.step("Verify the `Confirm Text` field is present")
+    def assert_confirm_text_field_present(self):
+        assert self.is_element_present(DeleteClassDialogLocator.confirm_text_field), \
+            "The `Confirm Text` field is missing from the `Delete Class` dialog"
+        return self
+
+    @allure.step("Confirm `Delete Class` dialog")
+    def confirm(self):
+        with allure.step("Type `CONFIRM` into the `Confirm Text` field"):
+            self.find_element(DeleteClassDialogLocator.confirm_text_field).send_keys("CONFIRM")
+        with allure.step("Submit"):
+            self.find_element(DeleteClassDialogLocator.confirm_text_field).submit()
+            self.wait_until_element_is_invisible(DeleteClassDialogLocator.delete_class_dialog)
+        return TeacherClassesPage(self.driver)
+
+
+class DeleteClassDialogLocator:
+    delete_class_dialog = (By.XPATH, "//h3[contains(text(), 'Delete Class')]/ancestor::div[@role='dialog']")
+    confirm_text_field = (By.ID, "form-ele-confirm_text")
 
 
 class CreateAssignmentForm(BasePage):
@@ -529,6 +606,10 @@ class TeacherClassesPageLocator:
         "//tr[@data-tour='first-class-row']/td/div/div[contains(text(),'class_name')]/ancestor::tr[@data-tour='first-class-row']/td[2]")
     class_title = (By.XPATH, "//td[2]")
     class_students_count = (By.XPATH, "//td[3]")
+    bulk_actions = (By.XPATH, "//div[contains(@class,'js-bulk-actions')]/..")
+    delete_class_error_dialog = (By.XPATH, "//h3[text()='Oops!']/ancestor::div[@role='dialog']")
+    delete_class_error_message = (
+        By.XPATH, "//h3[text()='Oops!']/../following-sibling::div[contains(@class,'content')]")
 
 
 class AddStudentsLocator:
@@ -537,12 +618,13 @@ class AddStudentsLocator:
     username_field = (By.ID, 'form-ele-username')
     password_field = (By.ID, 'form-ele-password')
     student_added_success = (By.XPATH, '//div[contains(@class, "notice--success")]')
+    # close_button = (By.XPATH, "//div[contains(text(), 'Bulk Actions')]//ancestor::div[contains(@class,'bulk-actions')]")
     close_button = (By.XPATH, "//div[@data-el='modal-close']")
-
 
 class YouHaveCreatedNewClassLocator:
     add_students_button = (By.XPATH, "//button[contains(@data-tour,'add-students')]")
     close_button = (By.XPATH, "//div[@data-el='modal-close']")
+    see_my_classes = (By.XPATH, "//div[contains(@class,'js-cancel')]")
 
 
 class CreateAClassLocator:
