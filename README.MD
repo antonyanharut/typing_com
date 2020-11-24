@@ -67,7 +67,7 @@ python3 run.py --group assignments
 python3 run.py -t 2
 ```
 
-- ```--throughput``` - simulate internet connectenciton speed
+- ```--throughput``` - simulate internet connectenciton speed  
  -- Supported only for Google Chrome
 ```sh
 python3 run.py --throughput 90
