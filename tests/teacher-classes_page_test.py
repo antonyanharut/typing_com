@@ -5,6 +5,7 @@ import allure
 import pytest
 
 from apis.typing import delete_teacher_using_cache
+from helpers import generate_random_email
 from pages.teacher_classes_page import SingleClassPage, TeacherClassesPage, DeleteClassDialog
 from pages.teacher_login_page import TeacherLoginPage
 
@@ -27,7 +28,7 @@ class TestTeacherClassesPage:
     @allure.story("Class Students")
     @pytest.mark.class_students
     def test_add_a_single_student(self):
-        username = f"tester{randint(10, 99)}test{randint(1000, 9999)}"
+        username = generate_random_email()
         self.page.create_a_new_class('Hello', self.page.create_a_new_class_close) \
             .click_on_class('Hello') \
             .click_on_add_students_button() \
@@ -111,8 +112,8 @@ class TestTeacherClassesPage:
     @allure.issue('13:13', "[Teacher] A long description gets out of the assignment summary window")
     @pytest.mark.class_assignments
     def test_add_assignment_with_multiple_students(self):
-        username = f"tester{randint(10, 99)}test{randint(1000, 9999)}"
-        username1 = f"tester{randint(10, 99)}test{randint(1000, 9999)}"
+        username = generate_random_email()
+        username1 = generate_random_email()
         self.page.create_a_new_class('Hello', self.page.create_a_new_class_close) \
             .click_on_class('Hello') \
             .click_on_add_students_button() \
@@ -151,7 +152,7 @@ class TestTeacherClassesPage:
     @allure.story("Classes")
     @pytest.mark.classes
     def test_add_class_add_students(self):
-        username = f"tester{randint(10, 99)}test{randint(1000, 9999)}"
+        username = generate_random_email()
         self.page.create_a_new_class('Hello', self.page.create_a_new_class_add_students) \
             .create_a_new_student(username)
         TeacherClassesPage(self.driver)\
@@ -172,7 +173,7 @@ class TestTeacherClassesPage:
     @allure.story("Classes")
     @pytest.mark.classes
     def test_delete_class_with_students(self):
-        username = f"tester{randint(10, 99)}test{randint(1000, 9999)}"
+        username = generate_random_email()
         self.page.create_a_new_class('Hello', self.page.create_a_new_class_add_students) \
             .create_a_new_student(username)
         TeacherClassesPage(self.driver)\

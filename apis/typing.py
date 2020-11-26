@@ -5,12 +5,14 @@ from random import randint
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webdriver import WebDriver
 
+from helpers import generate_random_email
+
 
 @allure.step("Create a new teacher account using the APIs.")
 def create_teacher_account():
     create_url = 'https://www.typing.com/apiv1/teacher/auth/signup'
     create_headers = {"content-type": "application/json"}
-    email = f"test{randint(10, 99)}tester{randint(1000, 9999)}@yopmail.com"
+    email = generate_random_email()
     name = "Test Tester"
     password = "Tester123"
     crate_body = {"login_type": "username", "full_name": f"{name}", "email": f"{email}", "password": f"{password}"}
@@ -66,7 +68,7 @@ def delete_teacher(teacher_id: str, token: str):
 
 def create_student_account():
     url = 'https://www.typing.com/apiv1/student/auth/signup'
-    username = f'tester{randint(10,99)}test{randint(1000,9999)}'
+    username = generate_random_email()
     password = 'Tester#123'
     body_json = {"username":f"{username}","password":f"{password}","password2":"","email":"","language":"","join_code":"","tos":"1"}
     response = requests.post(url=url, json=body_json).json()

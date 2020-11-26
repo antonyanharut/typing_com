@@ -7,6 +7,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
+
+from helpers import generate_random_email
 from pages.forms import GoogleSignupForm, WelcomeToTypingPage
 from pages.basepage import BasePage
 from random import randint
@@ -112,7 +114,7 @@ class TeacherSignupPage(BasePage):
         self.find_element(TeacherSignupLocator.full_name_field).send_keys(full_name)
 
     def type_random_email(self) -> str:
-        email = f"tester{randint(10, 99)}test{randint(10000, 99999)}@yopmail.com"
+        email = generate_random_email()
         with allure.step(f"Write `{email}` email address into to email field of Teacher Signup page"):
             self.find_element(TeacherSignupLocator.email_field).send_keys(email)
         return email
